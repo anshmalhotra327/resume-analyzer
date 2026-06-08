@@ -20,8 +20,9 @@ app.add_middleware(
 )
 
 # Load ML model
-model = joblib.load("resume_model.pkl")
-
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+model = joblib.load(os.path.join(BASE_DIR, "resume_model.pkl"))
 # Configure Gemini
 client = genai.Client(api_key="YOUR_GEMINI_KEY_HERE")
 

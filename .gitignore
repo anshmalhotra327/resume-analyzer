@@ -1,7 +1,7 @@
 # Backend
 backend/__pycache__/
 backend/*.pyc
-backend/resume_model.pkl
+
 
 # Frontend
 frontend/node_modules/
