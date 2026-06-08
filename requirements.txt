@@ -1,8 +1,9 @@
-fastapi
-uvicorn
-python-multipart
-pdfplumber
-joblib
-pandas
-scikit-learn
-google-generativeai
+fastapi==0.111.0
+uvicorn==0.29.0
+python-multipart==0.0.9
+pdfplumber==0.11.0
+joblib==1.4.2
+pandas==2.2.2
+scikit-learn==1.4.2
+google-genai==1.16.0
+numpy==1.26.4
