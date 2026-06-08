@@ -1,0 +1,5 @@
+in backend
+python main.py
+
+in frontend
+npm run dev
