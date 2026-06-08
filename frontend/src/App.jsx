@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
+const API = "https://resume-analyzer-five-rho.vercel.app";
 
-const API = "http://localhost:8000";
 const palette = {
   bg: "#0A0A0A",
   surface: "#111111",
