@@ -97,6 +97,66 @@ def extract_features(text: str) -> dict:
     return features
 
 
+def extract_features_with_ai(resume_text: str) -> dict:
+    prompt = f"""
+    Analyze this resume and return ONLY a JSON object with these fields:
+    {{
+      "num_projects": <count of projects listed>,
+      "num_internships": <count of internships>,
+      "num_skills": <count of skills mentioned>,
+      "num_certifications": <count of certifications>,
+      "has_linkedin": <1 or 0>,
+      "has_github": <1 or 0>,
+      "has_summary_section": <1 or 0>,
+      "has_awards": <1 or 0>,
+      "years_experience": <estimated years>,
+      "num_languages_known": <programming languages count>
+    }}
+
+    Resume:
+    {resume_text}
+
+    Return ONLY the JSON, no extra text.
+    """
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt
+    )
+    import json
+    text = response.text.strip().lstrip("```json").rstrip("```").strip()
+    try:
+        ai_features = json.loads(text)
+        # Merge with defaults
+        features = {
+            "job_category": "Unknown",
+            "education_level": "Unknown",
+            "gpa": 0,
+            "years_experience": ai_features.get("years_experience", 0),
+            "num_skills": ai_features.get("num_skills", 0),
+            "skills": "",
+            "num_projects": ai_features.get("num_projects", 0),
+            "num_internships": ai_features.get("num_internships", 0),
+            "has_linkedin": ai_features.get("has_linkedin", 0),
+            "has_github": ai_features.get("has_github", 0),
+            "has_portfolio": 0,
+            "has_links": ai_features.get("has_linkedin", 0),
+            "has_summary_section": ai_features.get("has_summary_section", 0),
+            "num_certifications": ai_features.get("num_certifications", 0),
+            "resume_word_length": len(resume_text.split()),
+            "resume_pages": 1,
+            "num_quantified_achievements": 0,
+            "num_action_verbs": 0,
+            "has_volunteer_work": 0,
+            "has_awards": ai_features.get("has_awards", 0),
+            "has_publications": 0,
+            "num_languages_known": ai_features.get("num_languages_known", 0),
+            "formatting_quality_score": 5,
+            "job_title_match": 0
+        }
+        return features
+    except Exception:
+        return extract_features(resume_text)  # fallback to old method
+
 @app.post("/analyze")
 async def analyze_resume(file: UploadFile = File(...)):
     if not file.filename.endswith(".pdf"):
@@ -108,7 +168,7 @@ async def analyze_resume(file: UploadFile = File(...)):
     if not resume_text.strip():
         raise HTTPException(status_code=400, detail="Could not extract text from PDF")
 
-    features = extract_features(resume_text)
+    features = extract_features_with_ai(resume_text)
     df = pd.DataFrame([features])
     score = round(float(model.predict(df)[0]), 2)
 
