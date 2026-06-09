@@ -143,7 +143,7 @@ async def get_suggestions(req: SuggestRequest):
     Return ONLY the JSON, no extra text.
     """
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.0-flash",
         contents=prompt
     )
     text = response.text.strip().lstrip("```json").rstrip("```").strip()
@@ -168,7 +168,7 @@ async def get_questions(req: QuestionsRequest):
     Return ONLY the JSON, no extra text.
     """
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.0-flash",
         contents=prompt
     )
     text = response.text.strip().lstrip("```json").rstrip("```").strip()
@@ -199,7 +199,7 @@ async def evaluate_answer(req: EvaluateRequest):
     Return ONLY the JSON, no extra text.
     """
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.0-flash",
         contents=prompt
     )
     text = response.text.strip().lstrip("```json").rstrip("```").strip()
