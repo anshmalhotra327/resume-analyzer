@@ -6,7 +6,7 @@ import pandas as pd
 import pdfplumber
 import io
 import json
-from dotenv import load_dotenv
+
 
 from google import genai
 
@@ -31,12 +31,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 model = joblib.load(os.path.join(BASE_DIR, "resume_model.pkl"))
 # Configure Gemini
-
-load_dotenv()
-# hello
-
-apikey = os.getenv("GEMINI_API_KEY")
-
+apikey = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=apikey)
 
 
