@@ -212,3 +212,15 @@ async def evaluate_answer(req: EvaluateRequest):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+@app.get("/test-gemini")
+async def test_gemini():
+    try:
+        c = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+        response = c.models.generate_content(
+            model="gemini-2.0-flash",
+            contents="Say hello in one word"
+        )
+        return {"success": True, "response": response.text}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
