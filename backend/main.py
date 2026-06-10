@@ -210,3 +210,10 @@ async def evaluate_answer(req: EvaluateRequest):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+
+
+@app.get("/test-key")
+async def test_key():
+    key = os.environ.get("GEMINI_API_KEY")
+    return {"key_found": key is not None, "key_prefix": key[:10] if key else "NOT FOUND"}
