@@ -33,6 +33,7 @@ model = joblib.load(os.path.join(BASE_DIR, "resume_model.pkl"))
 # Configure Gemini
 
 load_dotenv()
+# hello
 
 apikey = os.getenv("GEMINI_API_KEY")
 
