@@ -27,7 +27,7 @@ model = joblib.load(os.path.join(BASE_DIR, "resume_model.pkl"))
 
 def get_client():
     apikey = os.environ.get("GROQ_API_KEY")
-    return genai.Client(api_key=apikey)
+    return Groq(api_key=apikey)
 
 def generate_text(prompt: str):
     client = get_client()
@@ -153,11 +153,11 @@ async def get_suggestions(req: SuggestRequest):
     Return ONLY the JSON, no extra text.
     """
     text = generate_text(prompt).strip()
-text = text.lstrip("```json").rstrip("```").strip()
+    text = text.lstrip("```json").rstrip("```").strip()
     try:
         return json.loads(text)
     except Exception:
-        return {"raw": response.text}
+        return {"raw": text}
 
 
 class QuestionsRequest(BaseModel):
@@ -175,11 +175,11 @@ async def get_questions(req: QuestionsRequest):
     Return ONLY the JSON, no extra text.
     """
     text = generate_text(prompt).strip()
-text = text.lstrip("```json").rstrip("```").strip()
+    text = text.lstrip("```json").rstrip("```").strip()
     try:
         return json.loads(text)
     except Exception:
-        return {"questions": [response.text]}
+        return {"questions": [text]}
 
 
 class EvaluateRequest(BaseModel):
@@ -203,11 +203,11 @@ async def evaluate_answer(req: EvaluateRequest):
     Return ONLY the JSON, no extra text.
     """
     text = generate_text(prompt).strip()
-text = text.lstrip("```json").rstrip("```").strip()
+    text = text.lstrip("```json").rstrip("```").strip()
     try:
         return json.loads(text)
     except Exception:
-        return {"raw": response.text}
+        return {"raw": text}
 
 
 if __name__ == "__main__":

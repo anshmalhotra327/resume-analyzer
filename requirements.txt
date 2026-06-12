@@ -5,6 +5,7 @@ pdfplumber==0.11.0
 joblib==1.4.2
 pandas==2.2.2
 scikit-learn==1.4.2
+groq
 numpy==1.26.4
 google-genai
 google-auth
