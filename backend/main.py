@@ -8,7 +8,7 @@ import io
 import json
 import os
 
-from google import genai
+from groq import Groq
 
 app = FastAPI(title="Resume Analyzer API")
 
@@ -26,8 +26,21 @@ model = joblib.load(os.path.join(BASE_DIR, "resume_model.pkl"))
 
 
 def get_client():
-    apikey = os.environ.get("GEMINI_API_KEY")
+    apikey = os.environ.get("GROQ_API_KEY")
     return genai.Client(api_key=apikey)
+
+def generate_text(prompt: str):
+    client = get_client()
+
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.3,
+    )
+
+    return response.choices[0].message.content
 
 
 def extract_text(pdf_bytes: bytes) -> str:
@@ -90,7 +103,7 @@ def extract_features(text: str) -> dict:
 
 @app.get("/test-key")
 async def test_key():
-    key = os.environ.get("GEMINI_API_KEY")
+    key = os.environ.get("GROQ_API_KEY")
     return {"key_found": key is not None, "key_prefix": key[:10] if key else "NOT FOUND"}
 
 
@@ -139,12 +152,8 @@ async def get_suggestions(req: SuggestRequest):
     }}
     Return ONLY the JSON, no extra text.
     """
-    client = get_client()
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
-    )
-    text = response.text.strip().lstrip("```json").rstrip("```").strip()
+    text = generate_text(prompt).strip()
+text = text.lstrip("```json").rstrip("```").strip()
     try:
         return json.loads(text)
     except Exception:
@@ -165,12 +174,8 @@ async def get_questions(req: QuestionsRequest):
     {{"questions": ["Q1...", "Q2...", "Q3...", "Q4...", "Q5..."]}}
     Return ONLY the JSON, no extra text.
     """
-    client = get_client()
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
-    )
-    text = response.text.strip().lstrip("```json").rstrip("```").strip()
+    text = generate_text(prompt).strip()
+text = text.lstrip("```json").rstrip("```").strip()
     try:
         return json.loads(text)
     except Exception:
@@ -197,12 +202,8 @@ async def evaluate_answer(req: EvaluateRequest):
     }}
     Return ONLY the JSON, no extra text.
     """
-    client = get_client()
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
-    )
-    text = response.text.strip().lstrip("```json").rstrip("```").strip()
+    text = generate_text(prompt).strip()
+text = text.lstrip("```json").rstrip("```").strip()
     try:
         return json.loads(text)
     except Exception:
@@ -212,15 +213,10 @@ async def evaluate_answer(req: EvaluateRequest):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-
-@app.get("/test-gemini")
-async def test_gemini():
+@app.get("/test-groq")
+async def test_groq():
     try:
-        c = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
-        response = c.models.generate_content(
-            model="gemini-2.0-flash",
-            contents="Say hello in one word"
-        )
-        return {"success": True, "response": response.text}
+        text = generate_text("Say hello in one word")
+        return {"success": True, "response": text}
     except Exception as e:
         return {"success": False, "error": str(e)}
